@@ -1,0 +1,1 @@
+This is some test text to test the download functionality of Hermes's RESTful API.
