@@ -97,9 +97,6 @@ public class ResourceInfo {
                     // Get all params from the location
                     String paramString = httpRequest.location().substring(httpRequest.location().indexOf(rootPath + mainPath) + rootPath.length() + mainPath.length(), httpRequest.location().length());
 
-                    System.out.println(rootPath + mainPath);
-                    System.out.println(paramString);
-
                     if (paramString.length() > 0) {
                         // Remove the first slash
                         paramString = paramString.substring(1);
