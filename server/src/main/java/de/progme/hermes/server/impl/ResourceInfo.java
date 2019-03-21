@@ -50,14 +50,18 @@ public class ResourceInfo {
 
     public Response execute(String path, Request httpRequest) {
 
+        Map.Entry<String, Entry> matchedEntry = null;
+
         // Search the right entry from the path requested because the path can have path parameters
         for (Map.Entry<String, Entry> entry : methods.entrySet()) {
-            if (path.startsWith(entry.getKey())) {
-                return process(entry.getKey(), entry.getValue(), httpRequest);
+            if (path.startsWith(entry.getKey()) && httpRequest.method() == entry.getValue().requestMethod()) {
+                matchedEntry = entry;
             }
         }
 
-        return process("", null, null);
+        if(matchedEntry == null) return process("", null, null);
+
+        return process(matchedEntry.getKey(), matchedEntry.getValue(), httpRequest);
     }
 
     private Response process(String mainPath, Entry entry, Request httpRequest) {
@@ -91,7 +95,10 @@ public class ResourceInfo {
                     objects[0] = httpRequest;
 
                     // Get all params from the location
-                    String paramString = httpRequest.location().substring(httpRequest.location().indexOf(mainPath) + mainPath.length(), httpRequest.location().length());
+                    String paramString = httpRequest.location().substring(httpRequest.location().indexOf(rootPath + mainPath) + rootPath.length() + mainPath.length(), httpRequest.location().length());
+
+                    System.out.println(rootPath + mainPath);
+                    System.out.println(paramString);
 
                     if (paramString.length() > 0) {
                         // Remove the first slash
