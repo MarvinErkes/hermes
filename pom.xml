@@ -15,6 +15,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <archiva.URL>https://repo.morx.me</archiva.URL>
     </properties>
 
     <developers>
@@ -38,4 +39,12 @@
             </plugin>
         </plugins>
     </build>
+
+    <distributionManagement>
+        <repository>
+            <id>candycraft-repo</id>
+            <name>release</name>
+            <url>${archiva.URL}/repository/internal</url>
+        </repository>
+    </distributionManagement>
 </project>
