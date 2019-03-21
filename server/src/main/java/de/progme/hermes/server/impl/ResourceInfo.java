@@ -79,7 +79,7 @@ public class ResourceInfo {
                 // TODO: Better implementation
                 Object[] objects = {httpRequest};
 
-                if (httpRequest.method() == RequestMethod.POST) {
+                if (httpRequest.method() == RequestMethod.POST || httpRequest.method() == RequestMethod.PUT) {
                     objects = new Object[entry.postParameters.size() + 1];
                     objects[0] = httpRequest;
                     int i = 1;

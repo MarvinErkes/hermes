@@ -53,9 +53,9 @@ public interface HermesClient {
 
     Response put(String relativePath, Headers headers) throws IOException;
 
-    Response put(URL url, Proxy proxy, Headers headers) throws IOException;
+    Response put(URL url, Proxy proxy, Body body, Headers headers) throws IOException;
 
-    Response put(String relativePath, Proxy proxy, Headers headers) throws IOException;
+    Response put(String relativePath, Proxy proxy, Body body, Headers headers) throws IOException;
 
     Response patch(URL url, Headers headers) throws IOException;
 

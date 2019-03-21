@@ -73,7 +73,7 @@ public class ConnectionHandler implements Runnable {
 
             if (!lines.toString().isEmpty()) {
                 Request httpRequest = new Request(lines.toString());
-                if (httpRequest.method() == RequestMethod.POST) {
+                if (httpRequest.method() == RequestMethod.POST || httpRequest.method() == RequestMethod.PUT) {
                     int length = Integer.parseInt(httpRequest.header("Content-Length"));
                     if (length > 0) {
                         char[] charArray = new char[length];

@@ -135,25 +135,37 @@ public class HermesClientImpl implements HermesClient {
     @Override
     public Response put(URL url, Headers headers) throws IOException {
 
-        return put(url, null, headers);
+        return put(url, null, null, headers);
     }
 
     @Override
-    public Response put(URL url, Proxy proxy, Headers headers) throws IOException {
+    public Response put(URL url, Proxy proxy, Body body, Headers headers) throws IOException {
 
-        return request(url, proxy, headers, RequestMethod.PUT);
+        Preconditions.checkNotNull(url, "url cannot be null");
+        Preconditions.checkNotNull(body, "body cannot be null");
+        Preconditions.checkNotNull(headers, "headers cannot be null");
+
+        HttpURLConnection connection = URLUtil.connection(url, proxy, connectTimeout, headers, RequestMethod.PUT);
+
+        try (DataOutputStream writer = new DataOutputStream(connection.getOutputStream())) {
+            writer.write(body.bytes());
+        }
+
+        byte[] response = URLUtil.readResponse(connection);
+
+        return new Response(Status.valueOf(connection.getResponseCode()), URLUtil.filterHeaders(connection.getHeaderFields()), Body.of(response));
     }
 
     @Override
     public Response put(String relativePath, Headers headers) throws IOException {
 
-        return put(relativePath, null, headers);
+        return put(relativePath, null, null, headers);
     }
 
     @Override
-    public Response put(String relativePath, Proxy proxy, Headers headers) throws IOException {
+    public Response put(String relativePath, Proxy proxy, Body body, Headers headers) throws IOException {
 
-        return put(buildPath(relativePath), proxy, headers);
+        return put(buildPath(relativePath), proxy, body, headers);
     }
 
     @Override
