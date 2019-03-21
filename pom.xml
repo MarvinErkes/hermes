@@ -5,7 +5,7 @@
     <groupId>de.progme</groupId>
     <artifactId>hermes</artifactId>
     <packaging>pom</packaging>
-    <version>2.2.2-SNAPSHOT</version>
+    <version>2.2.3-SNAPSHOT</version>
     <inceptionYear>2016</inceptionYear>
     <modules>
         <module>server</module>
