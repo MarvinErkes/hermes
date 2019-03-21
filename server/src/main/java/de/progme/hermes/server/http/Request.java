@@ -40,6 +40,8 @@ public class Request {
 
     private Map<String, String> headers = new HashMap<>();
 
+    private String body;
+
     private Map<String, String> postData = new HashMap<>();
 
     public Request(String raw) {
@@ -92,6 +94,8 @@ public class Request {
 
     protected void postData(String data) {
 
+        this.body = data;
+
         String[] splitted = data.split("&");
         for (String aSplitted : splitted) {
             String[] keyVal = aSplitted.split("=");
@@ -99,6 +103,11 @@ public class Request {
                 postData.put(keyVal[0], keyVal[1]);
             }
         }
+    }
+
+    public String body() {
+
+        return body;
     }
 
     public String post(String key) {
