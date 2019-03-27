@@ -233,7 +233,7 @@ public class HermesServerImpl implements HermesServer {
         for (Map.Entry<String, ResourceInfo> entry : resourceInfo.entrySet()) {
             if (request.location().startsWith(entry.getKey())) {
 
-                return entry.getValue().execute(request.location().replace(entry.getKey(), ""), request);
+                return entry.getValue().execute(request.location().replaceFirst(entry.getKey(), ""), request);
             }
         }
 

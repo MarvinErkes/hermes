@@ -54,7 +54,7 @@ public class ResourceInfo {
 
         // Search the right entry from the path requested because the path can have path parameters
         for (Map.Entry<String, Entry> entry : methods.entrySet()) {
-            if (path.startsWith(entry.getKey()) && httpRequest.method() == entry.getValue().requestMethod()) {
+            if (path.startsWith(entry.getKey() + "/") && httpRequest.method() == entry.getValue().requestMethod()) {
                 matchedEntry = entry;
             }
         }
