@@ -5,18 +5,13 @@
     <groupId>de.progme</groupId>
     <artifactId>hermes</artifactId>
     <packaging>pom</packaging>
-    <version>2.2.4-SNAPSHOT</version>
+    <version>2.2.4</version>
     <inceptionYear>2016</inceptionYear>
     <modules>
         <module>server</module>
         <module>client</module>
         <module>shared</module>
     </modules>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <archiva.URL>https://repo.morx.me</archiva.URL>
-    </properties>
 
     <developers>
         <developer>
@@ -39,12 +34,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <distributionManagement>
-        <repository>
-            <id>candycraft-repo</id>
-            <name>release</name>
-            <url>${archiva.URL}/repository/internal</url>
-        </repository>
-    </distributionManagement>
 </project>
