@@ -54,17 +54,19 @@ public class ResourceInfo {
 
         // Search the right entry from the path requested because the path can have path parameters
         for (Map.Entry<String, Entry> entry : methods.entrySet()) {
-            if (path.startsWith(entry.getKey() + "/") && httpRequest.method() == entry.getValue().requestMethod()) {
+            System.out.println(path);
+            System.out.println(entry.getKey());
+            if (path.matches(entry.getKey()) && httpRequest.method() == entry.getValue().requestMethod()) {
                 matchedEntry = entry;
             }
         }
 
-        if(matchedEntry == null) return process("", null, null);
+        if(matchedEntry == null) return process(null, null);
 
-        return process(matchedEntry.getKey(), matchedEntry.getValue(), httpRequest);
+        return process(matchedEntry.getValue(), httpRequest);
     }
 
-    private Response process(String mainPath, Entry entry, Request httpRequest) {
+    private Response process(Entry entry, Request httpRequest) {
 
         if (entry != null) {
             if (!entry.acceptContentType.equals("*/*") && !entry.acceptContentType.equals(httpRequest.header("Content-Type"))) {
@@ -95,7 +97,7 @@ public class ResourceInfo {
                     objects[0] = httpRequest;
 
                     // Get all params from the location
-                    String paramString = httpRequest.location().substring(httpRequest.location().indexOf(rootPath + mainPath) + rootPath.length() + mainPath.length(), httpRequest.location().length());
+                    String paramString = httpRequest.location().substring(httpRequest.location().indexOf(rootPath + entry.getMainPath()) + rootPath.length() + entry.getMainPath().length(), httpRequest.location().length());
 
                     if (paramString.length() > 0) {
                         // Remove the first slash
@@ -108,7 +110,7 @@ public class ResourceInfo {
                         String[] params = paramString.split("/");
 
                         // Fast array copy
-                        System.arraycopy(params, 0, objects, 1, params.length/* + 1 - 1*/);
+                        System.arraycopy(params, 0, objects, 1, params.length-1);
                     }
                 }
 
@@ -124,6 +126,12 @@ public class ResourceInfo {
     }
 
     public void add(String path, Entry entry) {
+
+        entry.setMainPath(path);
+
+        path = path
+                .replaceAll("\\{.*?}", "(.*?)")
+                .replaceAll("/", "\\\\/");
 
         methods.put(path, entry);
     }
@@ -151,6 +159,8 @@ public class ResourceInfo {
         private List<String> postParameters = new ArrayList<>();
 
         private List<String> pathParameters = new ArrayList<>();
+
+        private String mainPath;
 
         public Entry(Method method, String contentType, String acceptContentType, RequestMethod requestMethod) {
 
@@ -198,6 +208,21 @@ public class ResourceInfo {
         public List<String> postParameters() {
 
             return postParameters;
+        }
+
+        public void setMainPath(String mainPath) {
+
+            // If path parameters are present, remove them to get the root path
+            if (mainPath.contains("{")) {
+                mainPath = mainPath.substring(0, mainPath.indexOf("{") - 1);
+            }
+
+            this.mainPath = mainPath;
+        }
+
+        public String getMainPath() {
+
+            return this.mainPath;
         }
     }
 }

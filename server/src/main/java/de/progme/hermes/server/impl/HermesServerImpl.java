@@ -126,12 +126,6 @@ public class HermesServerImpl implements HermesServer {
                     ResourceInfo.Entry resEntry;
 
                     String path = method.getAnnotation(Path.class).value();
-                    String copyPath = path;
-
-                    // If path parameters are present, remove them to get the root path
-                    if (path.contains("{")) {
-                        path = path.substring(0, path.indexOf("{") - 1);
-                    }
 
                     resourceInfo.add(path, (method.isAnnotationPresent(Produces.class)) ? resEntry = new ResourceInfo.Entry(method, method.getAnnotation(Produces.class).value().type(), (method.isAnnotationPresent(Consumes.class)) ? method.getAnnotation(Consumes.class).value().type() : ContentType.ALL.type(), requestMethod) : (resEntry = new ResourceInfo.Entry(method, requestMethod)));
 
@@ -145,7 +139,7 @@ public class HermesServerImpl implements HermesServer {
                     }
 
                     // Getting path variables
-                    String[] splitted = copyPath.split("/");
+                    String[] splitted = path.split("/");
                     List<String> rawParams = new ArrayList<>();
 
                     for (String p : splitted) {
