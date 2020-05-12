@@ -26,10 +26,10 @@ import de.progme.hermes.shared.http.Response;
 
 import java.lang.reflect.Method;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Created by Marvin Erkes on 30.01.2016.
@@ -40,7 +40,7 @@ public class ResourceInfo {
 
     private String rootPath;
 
-    private Map<String, Entry> methods = new HashMap<>();
+    private List<Entry> methods = new ArrayList<>();
 
     public ResourceInfo(Object object, String rootPath) {
 
@@ -50,18 +50,18 @@ public class ResourceInfo {
 
     public Response execute(String path, Request httpRequest) {
 
-        Map.Entry<String, Entry> matchedEntry = null;
+        Entry matchedEntry = null;
 
         // Search the right entry from the path requested because the path can have path parameters
-        for (Map.Entry<String, Entry> entry : methods.entrySet()) {
-            if (path.matches(entry.getKey()) && httpRequest.method() == entry.getValue().requestMethod()) {
+        for (Entry entry : methods) {
+            if (path.matches(entry.getRegexPath()) && httpRequest.method() == entry.requestMethod()) {
                 matchedEntry = entry;
             }
         }
 
         if(matchedEntry == null) return process(null, null);
 
-        return process(matchedEntry.getValue(), httpRequest);
+        return process(matchedEntry, httpRequest);
     }
 
     private Response process(Entry entry, Request httpRequest) {
@@ -95,20 +95,18 @@ public class ResourceInfo {
                     objects[0] = httpRequest;
 
                     // Get all params from the location
-                    String paramString = httpRequest.location().substring(httpRequest.location().indexOf(rootPath + entry.getMainPath()) + rootPath.length() + entry.getMainPath().length(), httpRequest.location().length());
+                    String paramString = httpRequest.location().substring(httpRequest.location().indexOf(rootPath) + rootPath.length(), httpRequest.location().length());
 
                     if (paramString.length() > 0) {
-                        // Remove the first slash
-                        paramString = paramString.substring(1);
 
                         // Decode with the URL decoder
                         paramString = URLDecoder.decode(paramString, "UTF-8");
-
-                        // Split with "/" to get all params
-                        String[] params = paramString.split("/");
-
-                        // Fast array copy
-                        System.arraycopy(params, 0, objects, 1, params.length-1);
+                        Pattern paramsRegex = Pattern.compile(entry.getRegexPath(), Pattern.DOTALL);
+                        Matcher paramsMatcher = paramsRegex.matcher(paramString);
+                        paramsMatcher.find();
+                        for(int i = 1; i <= paramsMatcher.groupCount(); i++) {
+                            objects[i] = paramsMatcher.group(i);
+                        }
                     }
                 }
 
@@ -126,22 +124,14 @@ public class ResourceInfo {
     public void add(String path, Entry entry) {
 
         entry.setMainPath(path);
+        entry.setRegexPath(path);
 
-        path = path
-                .replaceAll("\\{.*?}", "(.*?)")
-                .replaceAll("/", "\\\\/");
-
-        methods.put(path, entry);
+        methods.add(entry);
     }
 
     public String rootPath() {
 
         return rootPath;
-    }
-
-    public Method method(String path) {
-
-        return methods.get(path).method;
     }
 
     public static class Entry {
@@ -159,6 +149,8 @@ public class ResourceInfo {
         private List<String> pathParameters = new ArrayList<>();
 
         private String mainPath;
+
+        private String regexPath;
 
         public Entry(Method method, String contentType, String acceptContentType, RequestMethod requestMethod) {
 
@@ -221,6 +213,19 @@ public class ResourceInfo {
         public String getMainPath() {
 
             return this.mainPath;
+        }
+
+        public void setRegexPath(String regexPath) {
+
+            regexPath = regexPath
+                    .replaceAll("\\{(.*?)\\}", "(.*)");
+
+            this.regexPath = regexPath;
+        }
+
+        public String getRegexPath() {
+
+            return this.regexPath;
         }
     }
 }
