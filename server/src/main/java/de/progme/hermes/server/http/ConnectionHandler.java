@@ -62,7 +62,6 @@ public class ConnectionHandler implements Runnable {
 
     @Override
     public void run() {
-
         StringBuilder lines = new StringBuilder();
 
         try {
@@ -82,10 +81,6 @@ public class ConnectionHandler implements Runnable {
                             httpRequest.postData(new String(charArray));
                         }
                     }
-                }
-
-                if (httpRequest.location().isEmpty()) {
-                    httpRequest.location = "*";
                 }
 
                 // TODO: 04.02.2016
